@@ -1,0 +1,115 @@
+<div class="dashboard-container">
+  <!-- 🔹 Header Toolbar -->
+  <mat-toolbar color="primary">
+    <span class="logo">💊 EvitalRx Dashboard</span>
+    <span class="spacer"></span>
+
+    <!-- Checkout Button -->
+    <button mat-button routerLink="/checkout">
+      🧾 Checkout ({{ orderList.length }})
+    </button>
+
+    <!-- Logout Button -->
+    <button mat-button color="accent" (click)="logout()">
+      🚪 Logout
+    </button>
+  </mat-toolbar>
+
+  <!-- 🔹 Search Field -->
+  <mat-card class="search-card" appearance="outlined">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search Medicines</mat-label>
+      <input
+        matInput
+        placeholder="Enter medicine name"
+        [(ngModel)]="searchTerm"
+        (keyup)="onSearch()"
+      />
+      <button mat-icon-button matSuffix>
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+  </mat-card>
+
+  <!-- 🔹 Loading Spinner -->
+  <div *ngIf="loading" class="loading">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+
+  <!-- 🔹 Medicine Search Results -->
+  <div class="medicine-list" *ngIf="!loading && medicines.length > 0">
+    <mat-card
+      class="medicine-card"
+      *ngFor="let med of medicines"
+      appearance="outlined"
+    >
+      <div class="medicine-info">
+        <h3>{{ med.medicine_name }}</h3>
+        <p>Manufacturer: {{ med.manufacturer }}</p>
+        <p>MRP: ₹{{ med.mrp }}</p>
+      </div>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="addToOrder(med)"
+        [disabled]="isAdded(med)"
+      >
+        {{ isAdded(med) ? '✅ Added' : '➕ Add to Order' }}
+      </button>
+    </mat-card>
+  </div>
+
+  <!-- 🔹 No Data Message -->
+  <p *ngIf="!loading && medicines.length === 0 && searchTerm" class="no-data">
+    No medicines found for "{{ searchTerm }}"
+  </p>
+
+  <!-- 🔹 Added to Order Table -->
+  <mat-card class="order-card" *ngIf="orderList.length > 0" appearance="outlined">
+    <h3>🧾 Added Medicines</h3>
+
+    <table class="order-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Medicine Name</th>
+          <th>Manufacturer</th>
+          <th>Price (₹)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let med of orderList; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ med.medicine_name }}</td>
+          <td>{{ med.manufacturer }}</td>
+          <td>{{ med.mrp }}</td>
+          <td>
+            <button
+              mat-icon-button
+              color="warn"
+              matTooltip="Remove from Order"
+              (click)="removeFromOrder(med)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 🔹 Total and Checkout Section -->
+    <div class="order-summary">
+      <p><strong>Total Items:</strong> {{ orderList.length }}</p>
+      <p>
+        <strong>Total Price:</strong>
+        <!-- ₹{{ orderList.reduce((sum, m) => sum + (m.mrp || 0), 0) }} -->
+      </p>
+
+      <button mat-raised-button color="primary" routerLink="/checkout">
+        🧾 Proceed to Checkout
+      </button>
+    </div>
+  </mat-card>
+</div>
